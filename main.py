@@ -33,8 +33,8 @@ def main(page: ft.Page):
     )
     
     conteiner_pb = ft.Column([
+        ft.Text("Rotacionando imagens...", size=16, color=ft.colors.BLACK),
         progress_bar,
-        ft.Text("Rotacionando imagens...", size=16, color=ft.colors.BLACK)
     ],
         alignment=ft.MainAxisAlignment.CENTER,
         visible=False,
@@ -61,15 +61,20 @@ def main(page: ft.Page):
         print(f"Rotating images {degrees} degrees")
         if len(files) == 0:
             return
+        incremento = (100 / len(files)) / 100
+        progresso = 0
         while len(files) > 0:
+            progresso = progresso + incremento
+            # print(progresso)
             file = files.pop(0)
+            progress_bar.value = progresso
             conteiner_pb.visible = True
             text_rotated_images_count.visible = True
             text_select_images_count.visible = False
             page.update()
             try:
                 img = Image.open(file.path)
-                print(f"Image {file.name} opened")
+                # print(f"Image {file.name} opened")
                 width, height = img.size
                 if width < height:
                     img.rotate(degrees, expand=True).save(file.path)
@@ -82,6 +87,7 @@ def main(page: ft.Page):
             time.sleep(0.1)
 
         conteiner_pb.visible = False
+        progress_bar.value = 0
         text_rotated_images_count.visible = False
 
         if images_rotated_count == 0:
@@ -169,7 +175,8 @@ def main(page: ft.Page):
                             width=500,
                             height=50,
                             on_click=lambda _: pick_files_dialog.pick_files(
-                                allow_multiple=True
+                                allow_multiple=True,
+                                allowed_extensions=["png", "JPEG"]
                             ),
                         ),
                     ],
@@ -190,13 +197,13 @@ def main(page: ft.Page):
                 ),
                 ft.Row(
                     [
-                        text_rotated_images_count,
+                        conteiner_pb,
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
                 ),
                 ft.Row(
                     [
-                        conteiner_pb,
+                        text_rotated_images_count,
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
                 ),
